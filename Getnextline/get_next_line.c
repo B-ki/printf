@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmorel <rmorel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/01 14:27:40 by rmorel            #+#    #+#             */
-/*   Updated: 2021/12/01 19:04:39 by rmorel           ###   ########.fr       */
+/*   Created: 2021/12/01 19:50:38 by rmorel            #+#    #+#             */
+/*   Updated: 2021/12/02 00:18:32 by rmorel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,80 +14,67 @@
 
 char	*get_next_line(int fd)
 {
-	static int	start_index;
-	char		*str;
+	static char *stock = NULL;
+	char		*s;
+	char		*tmp;
+	char		*buff;
+	int			ret;
 
-	str = ft_newline_to_str(fd, start_index);
-	ft_putstr(str);
-	start_index = start_index + ft_get_size(fd, start_index); 
-	return (str);
-}
-
-void	ft_putstr(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
+	s = NULL;
+	if (!s)
 	{
-		write(1, &str[i], 1);
-		i++;
+		s = malloc(sizeof(*s));
+		if (!s)
+			return (NULL);
+		s[0] = '\0';
 	}
-}
-
-char	*ft_newline_to_str(int fd, int start_index)
-{
-	char	*s;
-	char	*skip[start_index];
-	int		ret;
-
-	ret = read(fd, skip, start_index);
-	s = malloc(sizeof(*s) * (ft_get_size(fd, start_index) + 1));
-	if (s)
+	tmp = NULL;
+	ret = 1;
+	buff = malloc(sizeof(char) * BUFFER_SIZE);
+	if (!buff)
+		return NULL;
+	if (!stock)
 	{
-		ret = read (fd, s, ft_get_size(fd, start_index));
-		s[ret] = '\0';
-		return (s);
+		stock = malloc(sizeof(*stock));
+		if (!stock)
+			return (NULL);
+		stock[0] = '\0';
 	}
-	return (NULL);
-}
-
-int	ft_get_size(int fd, int start_index)
-{
-	char	*buff[BUFFER_SIZE];
-	char	*skip[start_index];
-	int		ret;
-	int		size;
-
-	ret = 0;
-	size = 0;
-	ret = read(fd, skip, start_index);
-	while (1)
+	while (ret != 0 && !ft_strchr(stock, 10))
 	{
 		ret = read(fd, buff, BUFFER_SIZE);
-		if (ret > 0 && ft_get_newline(buff) == BUFFER_SIZE)
-			size = size + ret;
-		else if (ret > 0)
-		{
-			size = size + ft_get_newline(buff);
-			break ;
-		}
-		else
-			break ;
+		stock = buff;
+		tmp = s;
+		if (!ft_strchr(stock, 10))
+			s = ft_strjoin(s, stock);
+		free(tmp);
 	}
-	return (size);
+	tmp = s;
+	printf("%s\n", ft_stock(stock));
+	printf("%s\n", s);
+	s = ft_strjoin(s, ft_stock(stock));
+	free (tmp);
+	free(buff);
+	return (s);
 }
 
-int	ft_get_newline(char *str[BUFFER_SIZE])
+char	*ft_stock(char *stock)
 {
-	int	i;
+	int		i;
+	char	*str;
+	int		size_str;
 
 	i = 0;
-	if (!str)
-		return (0);
-	while (str[i] && i != '\n' && i < BUFFER_SIZE)
-		i++;
-	return (i);
+	if (stock)
+	{
+		size_str = ft_strchr(stock, 10) - stock;
+		printf("%d\n", size_str);
+		str = ft_substr(stock, 0, size_str);
+		str[size_str + 1] = '\0';
+		stock = ft_substr(stock, size_str + 1, ft_strlen(stock) - size_str + 1);
+		return (str);
+	}
+	return (NULL);
 }
 
 int	main()
@@ -95,6 +82,7 @@ int	main()
 	int	fd;
 	
 	fd = open("files/test0", O_RDONLY);
-	get_next_line(fd);
+	printf("%s\n", get_next_line(fd));
+	
 	return (0);
 }
