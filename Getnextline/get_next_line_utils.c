@@ -6,7 +6,7 @@
 /*   By: rmorel <rmorel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 14:29:05 by rmorel            #+#    #+#             */
-/*   Updated: 2021/12/01 22:52:01 by rmorel           ###   ########.fr       */
+/*   Updated: 2021/12/02 14:26:11 by rmorel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,40 +18,43 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	int		i;
 	int		j;
 
-	if (!s1 || !s2)
+	if (!s1 && !s2)
 		return (0);
 	dest = malloc(sizeof(*dest) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (!dest)
 		return (0);
 	i = 0;
 	j = 0;
-	while (s1[i])
+	while (s1 && s1[i])
 	{
 		dest[i] = s1[i];
 		i++;
 	}
-	while (s2[j])
+	while (s2 && s2[j])
 	{
 		dest[i] = s2[j];
 		i++;
 		j++;
 	}
 	dest[i] = '\0';
+	free ((void *)s1);
 	return (dest);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*ft_search_nl(const char *s)
 {
 	int	i;
 
 	i = 0;
+	if (!s)
+		return ((char *)s);
 	while (s[i])
 	{
-		if (s[i] == (unsigned char)c)
+		if (s[i] == 10)
 			return ((char *)&s[i]);
 		i++;
 	}
-	if (s[i] == (unsigned char)c)
+	if (s[i] == 10)
 		return ((char *)&s[i]);
 	return (NULL);
 }
@@ -102,6 +105,8 @@ size_t	ft_strlen(const char *str)
 	int	i;
 
 	i = 0;
+	if (!str)
+		return (0);
 	while (str[i])
 		i++;
 	return (i);
