@@ -6,17 +6,15 @@
 /*   By: rmorel <rmorel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 19:50:38 by rmorel            #+#    #+#             */
-/*   Updated: 2021/12/02 15:49:36 by rmorel           ###   ########.fr       */
+/*   Updated: 2021/12/02 18:50:55 by rmorel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-/*const	int BUFFER_SIZE = 42;*/
-
 char	*get_next_line(int fd)
 {
-	static char *stock;
+	static char	*stock;
 	char		*s;
 	char		*buff;
 	int			ret;
@@ -24,40 +22,47 @@ char	*get_next_line(int fd)
 	if (!stock)
 		stock = NULL;
 	s = NULL;
-	buff = malloc(sizeof(char) * BUFFER_SIZE);
+	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buff)
-		return NULL;
+		return (NULL);
 	ret = 1;
 	while (ret > 0 && !ft_search_nl(stock))
 	{
 		ret = read(fd, buff, BUFFER_SIZE);
+		buff[ret] = '\0';
 		stock = ft_strcpy(buff);
 		if (!ft_search_nl(stock))
-			s = ft_strjoin(s, stock);
+		{
+			s = ft_strjoin_freetwo(s, stock);
+			stock = NULL;
+		}
 	}
-	s = ft_strjoin(s, ft_stock(&stock));
+	if (ret <= 0)
+		return (NULL);
+	s = ft_strjoin_freetwo(s, ft_stock(&stock));
+	free (buff);
+	if (stock[0] == '\0')
+		free(stock);
 	return (s);
 }
 
 char	*ft_stock(char **stock)
 {
-	int		i;
 	char	*str;
-	int		size_str;
+	int		sz;
 
-	i = 0;
-	size_str = 0;
+	sz = 0;
 	if (*stock)
 	{
-		size_str = ft_search_nl(*stock) - *stock;
-		str = ft_substr(*stock, 0, size_str);
-		*stock = ft_substr(*stock, size_str + 1, ft_strlen(*stock) - size_str + 1);
+		sz = ft_search_nl(*stock) - *stock;
+		str = ft_substr(*stock, 0, sz);
+		*stock = ft_substr(*stock, sz + 1, ft_strlen(*stock) - sz + 1);
 		return (str);
 	}
 	return (NULL);
 }
 
-char *ft_strcpy(char *buff)
+char	*ft_strcpy(char *buff)
 {
 	char	*stock;
 	int		i;
@@ -65,22 +70,57 @@ char *ft_strcpy(char *buff)
 	i = 0;
 	stock = malloc(sizeof(char) * (ft_strlen(buff) + 1));
 	if (!stock)
-		return NULL;
+		return (NULL);
 	while (buff && buff[i])
 	{
-		stock[i] = buff [i];
+		stock[i] = buff[i];
 		i++;
 	}
 	stock[i] = '\0';
-	free (buff);
 	return (stock);
 }
 
-int	main()
+char	*ft_strjoin_freetwo(char const *s1, char const *s2)
+{
+	char	*dest;
+	int		i;
+	int		j;
+
+	if (!s1 && !s2)
+		return (0);
+	dest = malloc(sizeof(*dest) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (!dest)
+		return (0);
+	i = 0;
+	j = 0;
+	while (s1 && s1[i])
+	{
+		dest[i] = s1[i];
+		i++;
+	}
+	while (s2 && s2[j])
+	{
+		dest[i] = s2[j];
+		i++;
+		j++;
+	}
+	dest[i] = '\0';
+	free ((void *)s1);
+	free ((void *)s2);
+	return (dest);
+}
+
+/*int	main()
 {
 	int	fd;
 	
 	fd = open("files/test0", O_RDONLY);
+	char *res = get_next_line(fd);
+	printf("%s\n", res);
+	free (res);
+	printf("%s\n", get_next_line(fd));
+	printf("%s\n", get_next_line(fd));
+	printf("%s\n", get_next_line(fd));
 	printf("%s\n", get_next_line(fd));
 	printf("%s\n", get_next_line(fd));
 	printf("%s\n", get_next_line(fd));
@@ -89,4 +129,4 @@ int	main()
 	printf("%s\n", get_next_line(fd));
 
 	return (0);
-}
+}*/

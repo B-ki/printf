@@ -6,7 +6,7 @@
 /*   By: rmorel <rmorel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/01 14:29:05 by rmorel            #+#    #+#             */
-/*   Updated: 2021/12/02 14:26:11 by rmorel           ###   ########.fr       */
+/*   Updated: 2021/12/02 17:40:03 by rmorel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ char	*ft_search_nl(const char *s)
 	int	i;
 
 	i = 0;
-	if (!s)
-		return ((char *)s);
+	if (s == NULL)
+		return (NULL);
 	while (s[i])
 	{
 		if (s[i] == 10)
